@@ -1,0 +1,43 @@
+service:
+  name: queridometro-server-lambda
+
+plugins:
+  - serverless-dotenv-plugin
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: us-east-1
+  environment:
+      ENV: production
+      RUNNER: lambda
+      NODE_ENV: production
+
+custom:
+  region: ${self:provider.region}
+  stage: ${opt:stage, self:provider.stage}
+  prefix: ${self:custom.stage}-${self:service}
+
+package:
+  exclude:
+    - src/**
+    - .git/**
+    - .env
+    - package.json
+    - yarn.lock
+    - README.md
+    - .DS_Store
+  excludeDevDependencies: true
+
+functions:
+  graphqlHandler:
+    handler: dist/lambda.graphqlHandler
+    events:
+      - http:
+          path: playground
+          method: get
+          cors: true
+      - http:
+          path: graphql
+          method: post
+          cors: true
