@@ -3,6 +3,7 @@ import { Config } from 'apollo-server-core'
 
 import resolvers from 'graphql/resolvers'
 import typeDefs from 'graphql/schema'
+import { schemaDirectives } from 'graphql/directives'
 
 const { NODE_ENV } = process.env
 
@@ -15,6 +16,7 @@ const APOLLO_CONFIG: Config = {
       : `${process.env.BASE_URL}/playground`,
   },
   introspection: true,
+  schemaDirectives,
   context: async context => {
     const dbConn = await getConnection()
     return { dbConn, ...context }

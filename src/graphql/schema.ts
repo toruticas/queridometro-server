@@ -1,6 +1,8 @@
 import { gql } from 'config/apollo'
 import scalarSchema from './scalar/schema'
 import groupSchema from './group/schema'
+import authSchema from './auth/schema'
+import { directivesSchema } from './directives/schema'
 
 const linkSchema = gql`
   type Query {
@@ -14,4 +16,10 @@ const linkSchema = gql`
   }
 `
 
-export default [linkSchema, scalarSchema, groupSchema]
+export default [
+  linkSchema,
+  directivesSchema,
+  scalarSchema,
+  groupSchema,
+  authSchema,
+]
