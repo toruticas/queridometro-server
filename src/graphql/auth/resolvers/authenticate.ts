@@ -1,16 +1,14 @@
 import { Model, Connection } from 'mongoose'
-import bcrypt from 'bcryptjs'
-import { formatRFC3339, addMilliseconds } from 'date-fns'
 
-import { ApolloError, UserInputError } from 'config/apollo'
+import { ApolloError } from 'config/apollo'
 import { logger } from 'config/logger'
-import { generateCredentials } from './generateCredentials'
 
-import { AuthModel, IAuth, IUser } from '../model'
+import { AuthModel, IAuth } from '../model'
+import { generateCredentials } from './generateCredentials'
 
 const authenticateQuery = async (
   parent: unknown,
-  args: {},
+  args: unknown,
   { dbConn, uuid }: { dbConn: Connection; uuid: string },
 ): Promise<{ auth: IAuth; accessToken: string }> => {
   const Auth: Model<IAuth> = AuthModel(dbConn)
@@ -36,13 +34,9 @@ const authenticateQuery = async (
       .exec()
 
     return { auth, accessToken }
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('> signup Mutation error: ', error)
-    if (error.name === 'MongoError' && error.code === 11000) {
-      throw new UserInputError('Phone number already registered')
-    } else {
-      throw new ApolloError('Something went wrong')
-    }
+    throw new ApolloError('Something went wrong')
   }
 }
 

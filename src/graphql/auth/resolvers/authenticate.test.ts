@@ -1,7 +1,7 @@
-import jwt from 'jsonwebtoken'
 import { Model } from 'mongoose'
 import { MongoMemoryServer } from 'mongodb-memory-server'
-import { differenceInDays } from 'date-fns'
+import { differenceInDays, addDays } from 'date-fns'
+import MockDate from 'mockdate'
 
 import 'config/load'
 import { gql } from 'config/apollo'
@@ -11,12 +11,6 @@ import { testClient } from 'helpers/testClient'
 import { AuthModel, IAuth } from '../model'
 
 const mongoServer = new MongoMemoryServer()
-
-const SIGNUP_FIXTURE = {
-  name: 'Rafael Silva',
-  email: 'toruticas@gmail.com',
-  password: 'q1w2e3',
-}
 
 const AUTHENTICATE = gql`
   query Authenticate {
@@ -63,6 +57,12 @@ const SIGNUP = gql`
   }
 `
 
+const SIGNUP_FIXTURE = {
+  name: 'Rafael Silva',
+  email: 'toruticas@gmail.com',
+  password: 'q1w2e3',
+}
+
 describe('auth resolvers', () => {
   let dbConn
 
@@ -71,12 +71,33 @@ describe('auth resolvers', () => {
     dbConn = await getConnection(mongoUri)
   })
 
+  afterEach(async () => {
+    const collections = dbConn.connection.collections
+
+    for (const key in collections) {
+      const collection = collections[key]
+      await collection.deleteMany()
+    }
+  })
+
   afterAll(async () => {
     await closeConnection()
     await mongoServer.stop()
   })
 
-  it('signup an authenticate', async () => {
+  test('authentication withou token', async () => {
+    const Auth: Model<IAuth> = AuthModel(dbConn)
+    const { mutate, query } = testClient()
+    const { errors, data } = await mutate({
+      query: AUTHENTICATE,
+      variables: {},
+    })
+
+    expect(errors?.[0].message).toBe('Unauthorized access')
+    expect(errors?.[0].extensions?.code).toBe('UNAUTHENTICATED')
+  })
+
+  test('signup an authenticate', async () => {
     const Auth: Model<IAuth> = AuthModel(dbConn)
     const { mutate, query } = testClient()
     const {
@@ -93,7 +114,7 @@ describe('auth resolvers', () => {
     const {
       errors: authenticateErrors,
       data: { authenticate },
-    } = await mutate(
+    } = await query(
       {
         query: AUTHENTICATE,
         variables: {},
@@ -110,5 +131,35 @@ describe('auth resolvers', () => {
     expect(signupErrors).toBeUndefined()
     expect(authenticate.auth.user.name).toBe(SIGNUP_FIXTURE.name)
     expect(authenticate.auth.email).toBe(SIGNUP_FIXTURE.email)
+  })
+
+  test('signup an authenticate after token expires', async () => {
+    const Auth: Model<IAuth> = AuthModel(dbConn)
+    const { mutate, query } = testClient()
+    const {
+      errors: signupErrors,
+      data: { signup },
+    } = await mutate({
+      query: SIGNUP,
+      variables: SIGNUP_FIXTURE,
+    })
+
+    MockDate.set(addDays(new Date(), 30))
+    const { errors, data } = await query(
+      {
+        query: AUTHENTICATE,
+        variables: {},
+      },
+      {
+        req: {
+          get() {
+            return signup.accessToken
+          },
+        },
+      },
+    )
+
+    expect(errors?.[0].message).toBe('Token expired')
+    expect(errors?.[0].extensions?.code).toBe('UNAUTHENTICATED')
   })
 })

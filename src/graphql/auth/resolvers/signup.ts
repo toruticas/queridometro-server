@@ -1,12 +1,13 @@
 import { Model, Connection } from 'mongoose'
+import { MongoError } from 'mongodb'
 import bcrypt from 'bcryptjs'
-import { formatRFC3339, addMilliseconds } from 'date-fns'
+import { formatRFC3339 } from 'date-fns'
 
 import { ApolloError, UserInputError } from 'config/apollo'
 import { logger } from 'config/logger'
-import { generateCredentials } from './generateCredentials'
 
-import { AuthModel, IAuth, IUser } from '../model'
+import { AuthModel, IAuth } from '../model'
+import { generateCredentials } from './generateCredentials'
 
 const signupMutation = async (
   parent: unknown,
@@ -45,13 +46,15 @@ const signupMutation = async (
     })
 
     return { auth, accessToken }
-  } catch (error) {
+  } catch (e: unknown) {
+    const error = e as MongoError
     logger.error('> signup Mutation error: ', error)
+
     if (error.name === 'MongoError' && error.code === 11000) {
-      throw new UserInputError('Phone number already registered')
-    } else {
-      throw new ApolloError('Something went wrong')
+      throw new UserInputError('Email already registered')
     }
+
+    throw new ApolloError('Something went wrong')
   }
 }
 

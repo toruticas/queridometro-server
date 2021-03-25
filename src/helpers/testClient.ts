@@ -1,15 +1,13 @@
-import { createTestClient } from 'apollo-server-testing'
+import { createTestClient, ApolloServerTestClient } from 'apollo-server-testing'
 import { ApolloServer } from 'apollo-server'
-import { APOLLO_CONFIG } from '../base'
-import { ApolloServerExpressConfig } from 'apollo-server-express'
 import { Config } from 'apollo-server-core'
 
-/**
- * Test client with custom context argument that can be set per query or mutate call
- * @param config Apollo Server config object
- * @param ctxArg Default argument object to be passed
- */
-const testClient = (ctxArg = {}, overrideConfig?: Config) => {
+import { APOLLO_CONFIG } from '../base'
+
+const testClient = (
+  ctxArg = {},
+  overrideConfig?: Config,
+): ApolloServerTestClient => {
   const config: Config = overrideConfig
     ? { ...APOLLO_CONFIG, ...overrideConfig }
     : APOLLO_CONFIG
@@ -17,20 +15,21 @@ const testClient = (ctxArg = {}, overrideConfig?: Config) => {
   const baseCtxArg = ctxArg
   let currentCtxArg = baseCtxArg
 
-  // eslint-disable-next-line jest/unbound-method
-  const { query, mutate } = createTestClient(
-    new ApolloServer({
-      ...config,
-      context: () =>
-        typeof config.context === 'function'
-          ? config.context(currentCtxArg)
-          : {},
-    }),
-  )
+  const server = new ApolloServer({
+    ...config,
+    context: () =>
+      typeof config.context === 'function' ? config.context(currentCtxArg) : {},
+  })
 
-  // Wraps query and mutate function to set context arguments
+  // eslint-disable-next-line jest/unbound-method
+  const { query, mutate } = createTestClient(server)
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const wrap = (fn: any) => (args: any, _ctxArg?: any) => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     currentCtxArg = _ctxArg === null ? baseCtxArg : _ctxArg
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     return fn(args)
   }
 

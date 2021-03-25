@@ -21,7 +21,7 @@ export default {
           throw new UserInputError('group does not exists')
         }
         return group
-      } catch (error) {
+      } catch (error: unknown) {
         if (error instanceof UserInputError) {
           throw error
         }
@@ -54,8 +54,7 @@ export default {
           updatedAt: dayjs().toDate(),
         })
         return newGroup
-      } catch (error) {
-        console.log(error)
+      } catch (error: unknown) {
         logger.error('> createGroup error: ', error)
         throw new ApolloError('Error while creating group')
       }

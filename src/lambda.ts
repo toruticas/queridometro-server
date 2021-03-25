@@ -14,6 +14,7 @@ const graphqlHandler = (
   callback: APIGatewayProxyCallback,
 ): void => {
   context.callbackWaitsForEmptyEventLoop = false
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
   server.createHandler({
     cors: {
       origin: '*',

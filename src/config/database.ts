@@ -1,4 +1,4 @@
-import mongoose, { Mongoose, Connection } from 'mongoose'
+import mongoose, { Mongoose } from 'mongoose'
 import { logger } from 'config/logger'
 
 const { NODE_ENV, MONGO_CONNECTION, DEBUG } = process.env

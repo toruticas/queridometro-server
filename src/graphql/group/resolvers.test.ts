@@ -1,4 +1,3 @@
-import jwt from 'jsonwebtoken'
 import { Model } from 'mongoose'
 import { MongoMemoryServer } from 'mongodb-memory-server'
 import { differenceInDays } from 'date-fns'

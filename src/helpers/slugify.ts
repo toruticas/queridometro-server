@@ -1,6 +1,6 @@
 /* eslint-disable no-useless-escape */
 
-const slugify = (value: string) => {
+const slugify = (value: string): string => {
   return value
     .toLowerCase()
     .replace(/[àÀáÁâÂãäÄÅåª]+/g, 'a') // Special Characters #1
