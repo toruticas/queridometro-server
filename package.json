@@ -28,7 +28,6 @@
     "dotenv": "^8.2.0",
     "graphql": "^15.5.0",
     "graphql-iso-date": "^3.6.1",
-    "graphql-tools": "^7.0.4",
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^3.6.5",
     "mongoose": "^5.12.1",

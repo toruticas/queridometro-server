@@ -1,6 +1,6 @@
 import { Model, Connection } from 'mongoose'
 
-import { ApolloError } from 'config/apollo'
+import { ApolloError, AuthenticationError } from 'config/apollo'
 import { logger } from 'config/logger'
 
 import { AuthModel, IAuth } from '../model'
@@ -15,7 +15,7 @@ const authenticateQuery = async (
   try {
     const auth = await Auth.findOne({ uuid }).exec()
     if (!auth) {
-      throw new Error('olar')
+      throw new AuthenticationError('Unauthorized access')
     }
 
     const {
@@ -35,6 +35,9 @@ const authenticateQuery = async (
 
     return { auth, accessToken }
   } catch (error: unknown) {
+    if (error instanceof AuthenticationError) {
+      throw error
+    }
     logger.error('> signup Mutation error: ', error)
     throw new ApolloError('Something went wrong')
   }

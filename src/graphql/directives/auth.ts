@@ -1,6 +1,11 @@
 import jwt from 'jsonwebtoken'
 import { defaultFieldResolver, GraphQLField } from 'graphql'
-import { AuthenticationError, SchemaDirectiveVisitor } from 'config/apollo'
+import {
+  AuthenticationError,
+  SchemaDirectiveVisitor,
+  TContextLambda,
+  TContextExpress,
+} from 'config/apollo'
 
 const { JWT_SECRET } = process.env
 
@@ -8,24 +13,6 @@ interface JwtData {
   iat: number
   exp: number
   uuid: string
-}
-
-interface TContextBase {
-  uuid: string
-}
-
-interface TContextLambda extends TContextBase {
-  event: {
-    headers: {
-      Authorization: string
-    }
-  }
-}
-
-interface TContextExpress extends TContextBase {
-  req: {
-    get: (header: string) => string
-  }
 }
 
 type TContext = TContextExpress | TContextLambda

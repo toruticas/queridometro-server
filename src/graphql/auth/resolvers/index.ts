@@ -1,4 +1,5 @@
 import { signupMutation } from './signup'
+import { signinMutation } from './signin'
 import { authenticateQuery } from './authenticate'
 
 export default {
@@ -7,5 +8,6 @@ export default {
   },
   Mutation: {
     signup: signupMutation,
+    signin: signinMutation,
   },
 }

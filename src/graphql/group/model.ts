@@ -2,7 +2,7 @@ import { Connection, Document, Schema, Model } from 'mongoose'
 
 export interface IGroupEditable {
   name: string
-  isPublic: boolean
+  isPublic?: boolean
 }
 
 export interface IGroup extends Document, IGroupEditable {

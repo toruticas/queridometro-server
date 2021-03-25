@@ -35,5 +35,7 @@ export default gql`
       password: String!
       avatar: String
     ): AuthResponse!
+
+    signin(email: String!, password: String!): AuthResponse!
   }
 `
