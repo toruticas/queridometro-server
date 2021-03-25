@@ -85,7 +85,7 @@ describe('auth resolvers', () => {
     await mongoServer.stop()
   })
 
-  test('authentication withou token', async () => {
+  test('authentication without token', async () => {
     const Auth: Model<IAuth> = AuthModel(dbConn)
     const { mutate, query } = testClient()
     const { errors, data } = await mutate({

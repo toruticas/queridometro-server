@@ -2,6 +2,7 @@ import { Connection, Document, Schema, Model } from 'mongoose'
 
 export interface IGroupEditable {
   name: string
+  isPublic: boolean
 }
 
 export interface IGroup extends Document, IGroupEditable {
@@ -13,6 +14,7 @@ export interface IGroup extends Document, IGroupEditable {
 const GroupSchema: Schema = new Schema({
   name: { type: String, required: true },
   slug: { type: String, required: true },
+  isPublic: { type: Boolean, required: true },
   createdAt: { type: Date, required: true },
   updatedAt: { type: Date, required: true },
 })

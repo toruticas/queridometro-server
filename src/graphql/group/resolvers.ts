@@ -43,12 +43,12 @@ export default {
         const group = await Group.findOne({ slug }).exec()
 
         if (group) {
-          // agora falta gerar uma hash aleatoria e adicionar no slug
           slug = `${slug}-${await generateRandomHash(8)}`
         }
 
         const newGroup = await Group.create({
           ...args,
+          isPublic: args.isPublic ?? false,
           slug,
           createdAt: dayjs().toDate(),
           updatedAt: dayjs().toDate(),

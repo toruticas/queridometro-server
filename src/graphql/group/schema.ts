@@ -6,13 +6,14 @@ export default gql`
   }
 
   extend type Mutation {
-    createGroup(name: String!): Group
+    createGroup(name: String!, isPublic: Boolean): Group @auth
   }
 
   type Group {
     " The name of the group "
     name: String!
     slug: String!
+    isPublic: Boolean
     createdAt: DateTime!
     updatedAt: DateTime!
   }
