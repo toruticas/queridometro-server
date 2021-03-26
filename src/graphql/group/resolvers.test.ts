@@ -33,6 +33,13 @@ const FETCH_GROUP = gql`
       name
       slug
       isPublic
+      participants {
+        isAdmin
+        user {
+          anonymous
+          name
+        }
+      }
     }
   }
 `
@@ -110,7 +117,18 @@ describe('group resolvers', () => {
       query: FETCH_GROUP,
       variables: { slug: 'rep-zeppelin' },
     })
-    expect(response.data.group).toMatchObject(GROUP_FIXTURE)
+    expect(response.data.group).toMatchObject({
+      name: 'Rep Zeppelin',
+      slug: 'rep-zeppelin',
+      isPublic: false,
+    })
+    expect(response.data.group.participants[0]).toMatchObject({
+      isAdmin: true,
+      user: {
+        anonymous: false,
+        name: 'Rafael Silva',
+      },
+    })
   })
 
   test('fetch a nonexistent group', async () => {

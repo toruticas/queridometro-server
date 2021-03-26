@@ -8,14 +8,6 @@ import {
   AuthenticationError,
 } from 'apollo-server-core'
 
-export interface Resolver<TArgs, TResponse> {
-  (
-    parent: unknown,
-    args: TArgs,
-    context: { dbConn: Connection },
-  ): Promise<TResponse>
-}
-
 interface TContextBase {
   uuid?: string
 }
@@ -32,6 +24,14 @@ export interface TContextExpress extends TContextBase {
   req: {
     get: (header: string) => string
   }
+}
+
+export interface Resolver<TArgs, TResponse> {
+  (
+    parent: unknown,
+    args: TArgs,
+    context: TContextBase & { dbConn: Connection },
+  ): Promise<TResponse>
 }
 
 export {

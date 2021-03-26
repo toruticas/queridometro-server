@@ -20,6 +20,6 @@ export default [
   linkSchema,
   directivesSchema,
   scalarSchema,
-  groupSchema,
   authSchema,
+  groupSchema,
 ]

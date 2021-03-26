@@ -9,6 +9,12 @@ export default gql`
     createGroup(name: String!, isPublic: Boolean): Group @auth
   }
 
+  type Participant {
+    isAdmin: Boolean!
+    uuid: String!
+    user: User!
+  }
+
   type Group {
     " The name of the group "
     name: String!
@@ -16,5 +22,6 @@ export default gql`
     isPublic: Boolean
     createdAt: DateTime!
     updatedAt: DateTime!
+    participants: [Participant]
   }
 `
