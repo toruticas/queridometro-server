@@ -23,7 +23,7 @@ const authenticateQuery = async (
       refreshToken,
       refreshTokenCreatedAt,
       refreshTokenExpiresAt,
-    } = await generateCredentials()
+    } = await generateCredentials(auth.user.anonymous)
 
     await auth
       .updateOne({

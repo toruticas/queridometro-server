@@ -1,6 +1,9 @@
 import crypto from 'crypto'
 
-const generateRandomHash = (size = 128): Promise<string> =>
+interface GenerateRandomHash {
+  (size?: number): Promise<string>
+}
+const generateRandomHash: GenerateRandomHash = (size = 128) =>
   new Promise((resolve, reject) => {
     crypto.randomBytes(size / 2, (err, buffer) => {
       if (err) {

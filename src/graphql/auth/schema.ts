@@ -10,7 +10,6 @@ export default gql`
   type Auth {
     uuid: ID!
     email: String!
-    accessToken: String!
     refreshToken: String!
     refreshTokenCreatedAt: DateTime
     refreshTokenExpiresAt: DateTime
@@ -32,6 +31,13 @@ export default gql`
     signup(
       name: String!
       email: String!
+      password: String!
+      avatar: String
+    ): AuthResponse!
+
+    signupAnonymous(
+      group: String!
+      name: String!
       password: String!
       avatar: String
     ): AuthResponse!

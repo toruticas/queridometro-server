@@ -3,22 +3,30 @@ import { MongoError } from 'mongodb'
 import bcrypt from 'bcryptjs'
 import { formatRFC3339 } from 'date-fns'
 
-import { ApolloError, UserInputError } from 'config/apollo'
+import { ApolloError, UserInputError, Resolver } from 'config/apollo'
 import { logger } from 'config/logger'
+import { generateRandomHash } from 'helpers/hash'
 
 import { AuthModel, IAuth } from '../model'
 import { generateCredentials } from './generateCredentials'
 
-const signupMutation = async (
-  parent: unknown,
-  args: {
-    name: string
-    email: string
-    password: string
-    avatar?: string
-  },
-  { dbConn }: { dbConn: Connection },
-): Promise<{ auth: IAuth; accessToken: string }> => {
+interface Args {
+  name: string
+  group: string
+  password: string
+  avatar?: string
+}
+
+interface Response {
+  auth: IAuth
+  accessToken: string
+}
+
+const signupAnonymousMutation: Resolver<Args, Response> = async (
+  parent,
+  { name, group, password, avatar },
+  { dbConn },
+) => {
   const Auth: Model<IAuth> = AuthModel(dbConn)
   try {
     const {
@@ -31,8 +39,8 @@ const signupMutation = async (
 
     const auth = await Auth.create({
       uuid,
-      email: args.email,
-      password: await bcrypt.hash(args.password, 10),
+      email: `anonymous+${generateRandomHash(16)}@queridometro.com.br`,
+      password: await bcrypt.hash(await generateRandomHash(), 10),
       refreshToken,
       refreshTokenCreatedAt,
       refreshTokenExpiresAt,
@@ -40,8 +48,8 @@ const signupMutation = async (
       updatedAt: formatRFC3339(new Date()),
       user: {
         anonymous: false,
-        name: args.name,
-        avatar: args.avatar,
+        name,
+        avatar,
       },
     })
 
@@ -58,4 +66,4 @@ const signupMutation = async (
   }
 }
 
-export { signupMutation }
+export { signupAnonymousMutation }

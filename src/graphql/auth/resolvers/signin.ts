@@ -40,7 +40,7 @@ const signinMutation: Resolver<Args, Response> = async (
       refreshToken,
       refreshTokenCreatedAt,
       refreshTokenExpiresAt,
-    } = await generateCredentials()
+    } = await generateCredentials(auth.user.anonymous)
 
     await auth
       .updateOne({
