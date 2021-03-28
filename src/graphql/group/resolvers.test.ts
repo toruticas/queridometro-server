@@ -216,6 +216,34 @@ describe('group resolvers', () => {
     expect(errors?.[0].extensions?.code).toBe('UNAUTHENTICATED')
   })
 
+  test('fetch a group non public with a authenticated user', async () => {
+    const Auth: Model<IAuth> = AuthModel(dbConn)
+    const Group: Model<IGroup> = GroupModel(dbConn)
+    const {
+      errors: signupErrors,
+      data: { signup },
+    } = await mutate({
+      query: SIGNUP,
+      variables: {
+        name: 'Silva Rafael',
+        email: 'gmail@toruticas.com',
+        password: 'q1w2e3',
+      },
+    })
+    const {
+      errors,
+      data: { findGroup },
+    } = await mutate(
+      {
+        query: FETCH_GROUP,
+        variables: { slug: 'rep-zeppelin' },
+      },
+      generateAuthContext(signup.accessToken),
+    )
+    expect(errors?.[0].message).toBe('Unauthorized access')
+    expect(errors?.[0].extensions?.code).toBe('UNAUTHENTICATED')
+  })
+
   test('fetch a nonexistent group', async () => {
     const Group: Model<IGroup> = GroupModel(dbConn)
     const { errors } = await mutate({
