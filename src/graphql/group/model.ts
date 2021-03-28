@@ -27,6 +27,7 @@ export interface GroupData extends GroupBase {
 }
 
 export interface IGroup extends GroupBase, Document {
+  password: string
   participants: IParticipant[]
 }
 
@@ -42,6 +43,7 @@ const GroupSchema: Schema = new Schema({
   name: { type: String, required: true },
   slug: { type: String, required: true, index: true, unique: true },
   isPublic: { type: Boolean, required: true },
+  password: { type: String, required: true },
   createdAt: { type: Date, required: true },
   updatedAt: { type: Date, required: true },
   participants: [ParticipantSchema],

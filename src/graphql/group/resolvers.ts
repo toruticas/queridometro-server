@@ -1,4 +1,5 @@
 import { Connection } from 'mongoose'
+import bcrypt from 'bcryptjs'
 import dayjs from 'dayjs'
 import {
   ApolloError,
@@ -16,18 +17,19 @@ import { AuthModel, IAuth } from '../auth/model'
 
 interface CreateGroupArgs {
   name: string
+  password: string
   isPublic?: boolean
 }
 
 const createGroup: Resolver<CreateGroupArgs, IGroup> = async (
   parent,
-  args,
+  { name, password, isPublic = false },
   { dbConn, uuid },
 ): Promise<IGroup> => {
   try {
     const Group = GroupModel(dbConn)
     const Auth = AuthModel(dbConn)
-    let slug = slugify(args.name)
+    let slug = slugify(name)
     const group = await Group.findOne({ slug }).exec()
     const auth = await Auth.findOne({ uuid }).exec()
 
@@ -40,8 +42,9 @@ const createGroup: Resolver<CreateGroupArgs, IGroup> = async (
     }
 
     const newGroup = await Group.create({
-      ...args,
-      isPublic: args.isPublic ?? false,
+      name,
+      password: await bcrypt.hash(password, 10),
+      isPublic,
       slug,
       participants: [{ isAdmin: true, auth }],
       createdAt: dayjs().toDate(),

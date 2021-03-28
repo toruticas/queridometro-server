@@ -16,12 +16,13 @@ const mongoServer = new MongoMemoryServer()
 
 const GROUP_FIXTURE = {
   name: 'Rep Zeppelin',
+  password: 'q1w2e3',
   isPublic: false,
 }
 
 const CREATE_GROUP = gql`
-  mutation($name: String!, $isPublic: Boolean) {
-    createGroup(name: $name, isPublic: $isPublic) {
+  mutation($name: String!, $password: String!, $isPublic: Boolean) {
+    createGroup(name: $name, password: $password, isPublic: $isPublic) {
       name
       slug
     }
