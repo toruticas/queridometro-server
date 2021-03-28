@@ -9,12 +9,13 @@ import { generateRandomHash } from 'helpers/hash'
 
 import { Role } from 'graphql/directives/auth'
 import { AuthModel, IAuth } from '../model'
+import { GroupModel, GroupData, IGroup } from 'graphql/group/model'
 import { generateCredentials } from './generateCredentials'
 
 interface Args {
   name: string
-  group: string
-  password: string
+  groupSlug: string
+  groupPassword: string
   avatar?: string
 }
 
@@ -25,11 +26,23 @@ interface Response {
 
 const signupAnonymousMutation: Resolver<Args, Response> = async (
   parent,
-  { name, group, password, avatar },
+  { name, groupSlug, groupPassword, avatar },
   { dbConn },
 ) => {
-  const Auth: Model<IAuth> = AuthModel(dbConn)
   try {
+    const Group = GroupModel(dbConn)
+    const Auth: Model<IAuth> = AuthModel(dbConn)
+    const group = await Group.findOne({ slug: groupSlug }).exec()
+
+    if (group === null) {
+      throw new UserInputError('Group slug or password is not invalid')
+    }
+
+    const valid = await bcrypt.compare(groupPassword, group.password)
+    if (!valid) {
+      throw new UserInputError('Group slug or password is not invalid')
+    }
+
     const {
       uuid,
       accessToken,
@@ -54,15 +67,23 @@ const signupAnonymousMutation: Resolver<Args, Response> = async (
       },
     })
 
-    return { auth, accessToken }
-  } catch (e: unknown) {
-    const error = e as MongoError
-    logger.error('> signup Mutation error: ', error)
+    await group
+      .updateOne({
+        participants: [...group.participants, { isAdmin: false, auth }],
+      })
+      .exec()
 
-    if (error.name === 'MongoError' && error.code === 11000) {
+    return { auth, accessToken }
+  } catch (error: unknown) {
+    if (error instanceof UserInputError) {
+      throw error
+    }
+
+    if (error instanceof MongoError && error.code === 11000) {
       throw new UserInputError('Email already registered')
     }
 
+    logger.error('> signup Mutation error: ', error)
     throw new ApolloError('Something went wrong')
   }
 }

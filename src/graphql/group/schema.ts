@@ -8,6 +8,7 @@ export default gql`
   extend type Mutation {
     createGroup(name: String!, password: String!, isPublic: Boolean): Group
       @auth(role: USER)
+    joinGroup(name: String!, password: String!): Group @auth(role: ANONYMOUS)
   }
 
   type Participant {

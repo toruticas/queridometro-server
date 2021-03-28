@@ -35,10 +35,10 @@ export default gql`
     ): AuthResponse!
 
     signupAnonymous(
-      group: String!
       name: String!
-      password: String!
       avatar: String
+      groupSlug: String!
+      groupPassword: String!
     ): AuthResponse!
 
     signin(email: String!, password: String!): AuthResponse!
