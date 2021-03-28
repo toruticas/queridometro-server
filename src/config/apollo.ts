@@ -8,8 +8,11 @@ import {
   AuthenticationError,
 } from 'apollo-server-core'
 
+import { Role } from 'graphql/directives/auth'
+
 interface TContextBase {
   uuid?: string
+  role?: Role
 }
 
 export interface TContextLambda extends TContextBase {

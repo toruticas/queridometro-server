@@ -34,7 +34,6 @@ const SIGNUP_ANONYMOUS = gql`
       accessToken
       auth {
         user {
-          anonymous
           name
           avatar
         }

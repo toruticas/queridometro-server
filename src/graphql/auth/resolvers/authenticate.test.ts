@@ -18,7 +18,6 @@ const AUTHENTICATE = gql`
       accessToken
       auth {
         user {
-          anonymous
           name
           avatar
         }
@@ -43,7 +42,6 @@ const SIGNUP = gql`
       accessToken
       auth {
         user {
-          anonymous
           name
           avatar
         }

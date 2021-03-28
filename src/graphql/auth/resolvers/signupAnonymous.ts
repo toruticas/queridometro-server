@@ -7,6 +7,7 @@ import { ApolloError, UserInputError, Resolver } from 'config/apollo'
 import { logger } from 'config/logger'
 import { generateRandomHash } from 'helpers/hash'
 
+import { Role } from 'graphql/directives/auth'
 import { AuthModel, IAuth } from '../model'
 import { generateCredentials } from './generateCredentials'
 
@@ -35,11 +36,12 @@ const signupAnonymousMutation: Resolver<Args, Response> = async (
       refreshToken,
       refreshTokenCreatedAt,
       refreshTokenExpiresAt,
-    } = await generateCredentials(false)
+    } = await generateCredentials(Role.Anonymous)
 
     const auth = await Auth.create({
       uuid,
       email: `anonymous+${generateRandomHash(16)}@queridometro.com.br`,
+      role: Role.Anonymous,
       password: await bcrypt.hash(await generateRandomHash(), 10),
       refreshToken,
       refreshTokenCreatedAt,
@@ -47,7 +49,6 @@ const signupAnonymousMutation: Resolver<Args, Response> = async (
       createdAt: formatRFC3339(new Date()),
       updatedAt: formatRFC3339(new Date()),
       user: {
-        anonymous: false,
         name,
         avatar,
       },

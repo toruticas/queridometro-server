@@ -3,6 +3,7 @@ import { Model, Connection } from 'mongoose'
 import { ApolloError, AuthenticationError } from 'config/apollo'
 import { logger } from 'config/logger'
 
+import { Role } from 'graphql/directives/auth'
 import { AuthModel, IAuth } from '../model'
 import { generateCredentials } from './generateCredentials'
 
@@ -23,7 +24,7 @@ const authenticateQuery = async (
       refreshToken,
       refreshTokenCreatedAt,
       refreshTokenExpiresAt,
-    } = await generateCredentials(auth.user.anonymous)
+    } = await generateCredentials(auth.role)
 
     await auth
       .updateOne({

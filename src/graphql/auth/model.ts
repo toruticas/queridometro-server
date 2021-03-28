@@ -1,7 +1,7 @@
 import { Document, Connection, Schema, Model } from 'mongoose'
+import { Role } from 'graphql/directives/auth'
 
 export interface IUser {
-  anonymous: boolean
   name: string
   avatar?: string
 }
@@ -9,6 +9,7 @@ export interface IUser {
 export interface IAuth extends Document {
   uuid: string
   email: string
+  role: Role
   password: string
   refreshToken: string
   refreshTokenCreatedAt: Date | string
@@ -21,6 +22,7 @@ export interface IAuth extends Document {
 const AuthSchema = new Schema({
   uuid: { type: String, required: true },
   email: { type: String, required: true },
+  role: { type: String, required: true },
   password: { type: String, required: true },
   refreshToken: { type: String, required: true },
   refreshTokenCreatedAt: { type: Date, required: true },
@@ -28,7 +30,6 @@ const AuthSchema = new Schema({
   createdAt: { type: Date, required: true },
   updatedAt: { type: Date, required: true },
   user: {
-    anonymous: { type: Boolean, required: true },
     name: { type: String, required: true },
     avatar: { type: String },
   },

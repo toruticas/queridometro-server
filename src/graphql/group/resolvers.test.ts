@@ -29,14 +29,13 @@ const CREATE_GROUP = gql`
 `
 const FETCH_GROUP = gql`
   query($slug: String!) {
-    group(slug: $slug) {
+    findGroup(slug: $slug) {
       name
       slug
       isPublic
       participants {
         isAdmin
         user {
-          anonymous
           name
         }
       }
@@ -56,6 +55,35 @@ const SIGNUP = gql`
     }
   }
 `
+
+const SIGNUP_ANONYMOUS = gql`
+  mutation AuthSignupAnonymous(
+    $name: String!
+    $group: String!
+    $password: String!
+    $avatar: String
+  ) {
+    signupAnonymous(
+      name: $name
+      group: $group
+      password: $password
+      avatar: $avatar
+    ) {
+      accessToken
+      auth {
+        user {
+          name
+        }
+      }
+    }
+  }
+`
+
+const SIGNUP_ANONYMOUS_FIXTURE = {
+  name: 'Rafael Silva',
+  group: 'rep-zeppelin',
+  password: 'q1w2e3',
+}
 
 describe('group resolvers', () => {
   const { mutate, query } = testClient()
@@ -88,7 +116,9 @@ describe('group resolvers', () => {
 
   test('create a group', async () => {
     const Group: Model<IGroup> = GroupModel(dbConn)
-    const response = await query(
+    const {
+      data: { createGroup },
+    } = await query(
       {
         query: CREATE_GROUP,
         variables: GROUP_FIXTURE,
@@ -96,47 +126,102 @@ describe('group resolvers', () => {
       tokenContext,
     )
     const group = await Group.findOne({}).populate('group')
-    expect(group).toMatchObject(response.data.createGroup)
+    expect(group).toMatchObject(createGroup)
+  })
+
+  test('create a group without auth', async () => {
+    const Group: Model<IGroup> = GroupModel(dbConn)
+    const { errors } = await query({
+      query: CREATE_GROUP,
+      variables: GROUP_FIXTURE,
+    })
+    expect(errors?.[0].message).toBe('Unauthorized access')
+    expect(errors?.[0].extensions?.code).toBe('UNAUTHENTICATED')
+  })
+
+  test('create group as anonymous user', async () => {
+    const Auth: Model<IAuth> = AuthModel(dbConn)
+    const { mutate } = testClient()
+    const {
+      errors: authErrors,
+      data: { signupAnonymous },
+    } = await mutate({
+      query: SIGNUP_ANONYMOUS,
+      variables: SIGNUP_ANONYMOUS_FIXTURE,
+    })
+    expect(authErrors).toBeUndefined()
+    expect(signupAnonymous.auth.user.name).toBe(SIGNUP_ANONYMOUS_FIXTURE.name)
+
+    const Group: Model<IGroup> = GroupModel(dbConn)
+    const { errors } = await query(
+      {
+        query: CREATE_GROUP,
+        variables: GROUP_FIXTURE,
+      },
+      generateAuthContext(signupAnonymous.accessToken),
+    )
+    expect(errors?.[0].message).toBe('Unauthorized access')
+    expect(errors?.[0].extensions?.code).toBe('UNAUTHENTICATED')
   })
 
   test('create a duplicate group name', async () => {
     const Group: Model<IGroup> = GroupModel(dbConn)
-    const response = await query(
+    const {
+      data: { createGroup },
+    } = await query(
       {
         query: CREATE_GROUP,
         variables: GROUP_FIXTURE,
       },
       tokenContext,
     )
-    expect(response.data.createGroup.slug).not.toBe('rep-zeppelin')
+    expect(createGroup.slug).not.toBe('rep-zeppelin')
   })
 
   test('fetch a group', async () => {
     const Group: Model<IGroup> = GroupModel(dbConn)
-    const response = await mutate({
-      query: FETCH_GROUP,
-      variables: { slug: 'rep-zeppelin' },
-    })
-    expect(response.data.group).toMatchObject({
+    const {
+      errors,
+      data: { findGroup },
+    } = await mutate(
+      {
+        query: FETCH_GROUP,
+        variables: { slug: 'rep-zeppelin' },
+      },
+      tokenContext,
+    )
+    expect(findGroup).toMatchObject({
       name: 'Rep Zeppelin',
       slug: 'rep-zeppelin',
       isPublic: false,
     })
-    expect(response.data.group.participants[0]).toMatchObject({
+    expect(findGroup.participants[0]).toMatchObject({
       isAdmin: true,
       user: {
-        anonymous: false,
         name: 'Rafael Silva',
       },
     })
   })
 
+  test('fetch a group non public', async () => {
+    const Group: Model<IGroup> = GroupModel(dbConn)
+    const {
+      errors,
+      data: { findGroup },
+    } = await mutate({
+      query: FETCH_GROUP,
+      variables: { slug: 'rep-zeppelin' },
+    })
+    expect(errors?.[0].message).toBe('Unauthorized access')
+    expect(errors?.[0].extensions?.code).toBe('UNAUTHENTICATED')
+  })
+
   test('fetch a nonexistent group', async () => {
     const Group: Model<IGroup> = GroupModel(dbConn)
-    const response = await mutate({
+    const { errors } = await mutate({
       query: FETCH_GROUP,
       variables: { slug: 'usp' },
     })
-    expect(response.errors[0].extensions.code).toBe('BAD_USER_INPUT')
+    expect(errors[0].extensions.code).toBe('BAD_USER_INPUT')
   })
 })

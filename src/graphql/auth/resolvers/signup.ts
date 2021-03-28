@@ -6,6 +6,7 @@ import { formatRFC3339 } from 'date-fns'
 import { ApolloError, UserInputError } from 'config/apollo'
 import { logger } from 'config/logger'
 
+import { Role } from 'graphql/directives/auth'
 import { AuthModel, IAuth } from '../model'
 import { generateCredentials } from './generateCredentials'
 
@@ -27,11 +28,12 @@ const signupMutation = async (
       refreshToken,
       refreshTokenCreatedAt,
       refreshTokenExpiresAt,
-    } = await generateCredentials(false)
+    } = await generateCredentials(Role.User)
 
     const auth = await Auth.create({
       uuid,
       email: args.email,
+      role: Role.User,
       password: await bcrypt.hash(args.password, 10),
       refreshToken,
       refreshTokenCreatedAt,
@@ -39,7 +41,6 @@ const signupMutation = async (
       createdAt: formatRFC3339(new Date()),
       updatedAt: formatRFC3339(new Date()),
       user: {
-        anonymous: false,
         name: args.name,
         avatar: args.avatar,
       },

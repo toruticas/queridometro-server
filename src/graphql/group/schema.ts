@@ -2,11 +2,11 @@ import { gql } from 'config/apollo'
 
 export default gql`
   extend type Query {
-    group(slug: String!): Group
+    findGroup(slug: String!): Group @auth(role: UNKNOWN)
   }
 
   extend type Mutation {
-    createGroup(name: String!, isPublic: Boolean): Group @auth
+    createGroup(name: String!, isPublic: Boolean): Group @auth(role: USER)
   }
 
   type Participant {

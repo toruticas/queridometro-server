@@ -2,7 +2,6 @@ import { gql } from 'config/apollo'
 
 export default gql`
   type User {
-    anonymous: Boolean!
     name: String!
     avatar: String
   }
@@ -24,7 +23,7 @@ export default gql`
   }
 
   extend type Query {
-    authenticate: AuthResponse! @auth
+    authenticate: AuthResponse! @auth(role: ANONYMOUS)
   }
 
   extend type Mutation {

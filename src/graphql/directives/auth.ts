@@ -17,9 +17,32 @@ interface JwtData {
 
 type TContext = TContextExpress | TContextLambda
 
+export enum Role {
+  Admin = 'admin',
+  User = 'user',
+  Anonymous = 'anonymous',
+  Unknown = 'unknown',
+}
+
+const handleError = (role: string, e: unknown) => {
+  const error = e as Error
+
+  if (role === 'UNKNOWN') {
+    return
+  }
+
+  if (error.name === 'TokenExpiredError') {
+    throw new AuthenticationError('Token expired')
+  }
+
+  throw new AuthenticationError('Unauthorized access')
+}
+
 class AuthDirective extends SchemaDirectiveVisitor {
   visitFieldDefinition(field: GraphQLField<unknown, TContext>): void {
     const originalResolve = field.resolve ?? defaultFieldResolver
+
+    const role = this.args.role
 
     field.resolve = function resolve(...args) {
       const context = args[2]
@@ -43,12 +66,7 @@ class AuthDirective extends SchemaDirectiveVisitor {
 
         args[2].uuid = uuid
       } catch (e: unknown) {
-        const error = e as Error
-        if (error.name === 'TokenExpiredError') {
-          throw new AuthenticationError('Token expired')
-        } else {
-          throw new AuthenticationError('Unauthorized access')
-        }
+        handleError(role, e)
       }
 
       return originalResolve.apply(this, args)

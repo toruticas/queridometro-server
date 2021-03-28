@@ -37,7 +37,6 @@ const SIGNIN = gql`
       accessToken
       auth {
         user {
-          anonymous
           name
           avatar
         }

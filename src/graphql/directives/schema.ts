@@ -1,6 +1,13 @@
 import { gql } from 'config/apollo'
 
 const directivesSchema = gql`
-  directive @auth on FIELD_DEFINITION
+  enum Role {
+    ADMIN
+    USER
+    ANONYMOUS
+    UNKNOWN
+  }
+
+  directive @auth(role: Role = UNKNOWN) on FIELD_DEFINITION
 `
 export { directivesSchema }
