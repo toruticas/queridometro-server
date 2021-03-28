@@ -1,7 +1,9 @@
 import { GraphQLDate, GraphQLTime, GraphQLDateTime } from 'graphql-iso-date'
 
-export default {
+const scalarResolvers = {
   Date: GraphQLDate,
   Time: GraphQLTime,
   DateTime: GraphQLDateTime,
 }
+
+export { scalarResolvers }

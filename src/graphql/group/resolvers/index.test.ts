@@ -10,7 +10,7 @@ import { testClient } from 'helpers/testClient'
 import { generateAuthContext } from 'helpers/testUtils'
 import { AuthModel, IAuth } from 'graphql/auth/model'
 
-import { GroupModel, IGroup } from './model'
+import { GroupModel, IGroup } from '../model'
 
 const mongoServer = new MongoMemoryServer()
 
@@ -60,15 +60,15 @@ const SIGNUP = gql`
 const SIGNUP_ANONYMOUS = gql`
   mutation AuthSignupAnonymous(
     $name: String!
-    $group: String!
-    $password: String!
     $avatar: String
+    $groupSlug: String!
+    $groupPassword: String!
   ) {
     signupAnonymous(
       name: $name
-      group: $group
-      password: $password
       avatar: $avatar
+      groupSlug: $groupSlug
+      groupPassword: $groupPassword
     ) {
       accessToken
       auth {
@@ -148,7 +148,11 @@ describe('group resolvers', () => {
       data: { signupAnonymous },
     } = await mutate({
       query: SIGNUP_ANONYMOUS,
-      variables: SIGNUP_ANONYMOUS_FIXTURE,
+      variables: {
+        name: 'Rafael Silva',
+        groupSlug: 'rep-zeppelin',
+        groupPassword: 'q1w2e3',
+      },
     })
     expect(authErrors).toBeUndefined()
     expect(signupAnonymous.auth.user.name).toBe(SIGNUP_ANONYMOUS_FIXTURE.name)

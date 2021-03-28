@@ -1,8 +1,8 @@
 import { getConnection } from 'config/database'
 import { Config } from 'apollo-server-core'
 
-import resolvers from 'graphql/resolvers'
-import typeDefs from 'graphql/schema'
+import { resolvers } from 'graphql/resolvers'
+import { typeDefs } from 'graphql/schema'
 import { schemaDirectives } from 'graphql/directives'
 
 const { NODE_ENV } = process.env

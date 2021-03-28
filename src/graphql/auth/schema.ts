@@ -1,6 +1,6 @@
 import { gql } from 'config/apollo'
 
-export default gql`
+const authSchema = gql`
   type User {
     name: String!
     avatar: String
@@ -44,3 +44,5 @@ export default gql`
     signin(email: String!, password: String!): AuthResponse!
   }
 `
+
+export { authSchema }

@@ -3,7 +3,7 @@ import { signupAnonymousMutation } from './signupAnonymous'
 import { signinMutation } from './signin'
 import { authenticateQuery } from './authenticate'
 
-export default {
+const authResolvers = {
   Query: {
     authenticate: authenticateQuery,
   },
@@ -13,3 +13,5 @@ export default {
     signin: signinMutation,
   },
 }
+
+export { authResolvers }

@@ -1,6 +1,6 @@
 import { gql } from 'config/apollo'
 
-export default gql`
+const groupSchema = gql`
   extend type Query {
     findGroup(slug: String!): Group @auth(role: UNKNOWN)
   }
@@ -27,3 +27,5 @@ export default gql`
     participants: [Participant]
   }
 `
+
+export { groupSchema }

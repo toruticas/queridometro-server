@@ -1,5 +1,7 @@
-import customResolver from './scalar/resolvers'
-import groupResolver from './group/resolvers'
-import authResolver from './auth/resolvers'
+import { scalarResolvers } from './scalar/resolvers'
+import { groupResolvers } from './group/resolvers'
+import { authResolvers } from './auth/resolvers'
 
-export default [customResolver, groupResolver, authResolver]
+const resolvers = [scalarResolvers, groupResolvers, authResolvers]
+
+export { resolvers }

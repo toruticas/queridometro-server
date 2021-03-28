@@ -74,4 +74,4 @@ class AuthDirective extends SchemaDirectiveVisitor {
   }
 }
 
-export default AuthDirective
+export { AuthDirective }

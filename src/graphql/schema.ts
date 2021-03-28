@@ -1,7 +1,7 @@
 import { gql } from 'config/apollo'
-import scalarSchema from './scalar/schema'
-import groupSchema from './group/schema'
-import authSchema from './auth/schema'
+import { scalarSchema } from './scalar/schema'
+import { groupSchema } from './group/schema'
+import { authSchema } from './auth/schema'
 import { directivesSchema } from './directives/schema'
 
 const linkSchema = gql`
@@ -16,10 +16,12 @@ const linkSchema = gql`
   }
 `
 
-export default [
+const typeDefs = [
   linkSchema,
   directivesSchema,
   scalarSchema,
   authSchema,
   groupSchema,
 ]
+
+export { typeDefs }
