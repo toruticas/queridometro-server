@@ -8,8 +8,9 @@ import {
   AuthenticationError,
 } from 'apollo-server-core'
 
-import { Role } from 'graphql/directives/auth'
 import { Groups } from 'graphql/group/dataSource'
+import { TContext } from 'graphql/dataSources'
+import { Role } from 'graphql/directives/enums'
 
 interface TContextBase {
   uuid?: string
@@ -27,13 +28,6 @@ export interface TContextLambda extends TContextBase {
 export interface TContextExpress extends TContextBase {
   req: {
     get: (header: string) => string
-  }
-}
-
-export interface TContext extends TContextBase {
-  dbConn: Connection
-  dataSources: {
-    groups: Groups
   }
 }
 

@@ -1,4 +1,4 @@
-import { Model, Connection } from 'mongoose'
+import { Model } from 'mongoose'
 import { MongoError } from 'mongodb'
 import bcrypt from 'bcryptjs'
 import { formatRFC3339 } from 'date-fns'
@@ -8,8 +8,9 @@ import { logger } from 'config/logger'
 import { generateRandomHash } from 'helpers/hash'
 
 import { Role } from 'graphql/directives/auth'
+import { GroupModel } from 'graphql/group/model'
+
 import { AuthModel, IAuth } from '../model'
-import { GroupModel, GroupData, IGroup } from 'graphql/group/model'
 import { generateCredentials } from './generateCredentials'
 
 interface Args {
@@ -53,7 +54,7 @@ const signupAnonymousMutation: Resolver<Args, Response> = async (
 
     const auth = await Auth.create({
       uuid,
-      email: `anonymous+${generateRandomHash(16)}@queridometro.com.br`,
+      email: `anonymous+${await generateRandomHash(16)}@queridometro.com.br`,
       role: Role.Anonymous,
       password: await bcrypt.hash(await generateRandomHash(), 10),
       refreshToken,

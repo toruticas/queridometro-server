@@ -1,5 +1,5 @@
 import { Document, Connection, Schema, Model } from 'mongoose'
-import { Role } from 'graphql/directives/auth'
+import { Role } from 'graphql/directives/enums'
 
 export interface IUser {
   name: string

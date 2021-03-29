@@ -5,7 +5,6 @@ import bcrypt from 'bcryptjs'
 import { ApolloError, UserInputError, Resolver } from 'config/apollo'
 import { logger } from 'config/logger'
 
-import { Role } from 'graphql/directives/auth'
 import { AuthModel, IAuth } from '../model'
 import { generateCredentials } from './generateCredentials'
 

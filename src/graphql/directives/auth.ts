@@ -6,6 +6,7 @@ import {
   TContextLambda,
   TContextExpress,
 } from 'config/apollo'
+import { Role } from './enums'
 
 const { JWT_SECRET } = process.env
 
@@ -17,13 +18,6 @@ interface JwtData {
 }
 
 type TContext = TContextExpress | TContextLambda
-
-export enum Role {
-  Admin = 'admin',
-  User = 'user',
-  Anonymous = 'anonymous',
-  Unknown = 'unknown',
-}
 
 const handleError = (role: string, e: unknown) => {
   const error = e as Error
@@ -42,8 +36,7 @@ const handleError = (role: string, e: unknown) => {
 class AuthDirective extends SchemaDirectiveVisitor {
   visitFieldDefinition(field: GraphQLField<unknown, TContext>): void {
     const originalResolve = field.resolve ?? defaultFieldResolver
-
-    const role = this.args.role
+    const requiredRole: string = this.args.role
 
     field.resolve = function resolve(...args) {
       const context = args[2]
@@ -68,7 +61,7 @@ class AuthDirective extends SchemaDirectiveVisitor {
         args[2].uuid = uuid
         args[2].role = role
       } catch (e: unknown) {
-        handleError(role, e)
+        handleError(requiredRole, e)
       }
 
       return originalResolve.apply(this, args)
