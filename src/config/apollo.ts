@@ -9,6 +9,7 @@ import {
 } from 'apollo-server-core'
 
 import { Role } from 'graphql/directives/auth'
+import { Groups } from 'graphql/group/dataSource'
 
 interface TContextBase {
   uuid?: string
@@ -29,12 +30,15 @@ export interface TContextExpress extends TContextBase {
   }
 }
 
+export interface TContext extends TContextBase {
+  dbConn: Connection
+  dataSources: {
+    groups: Groups
+  }
+}
+
 export interface Resolver<TArgs, TResponse> {
-  (
-    parent: unknown,
-    args: TArgs,
-    context: TContextBase & { dbConn: Connection },
-  ): Promise<TResponse>
+  (parent: unknown, args: TArgs, context: TContext): Promise<TResponse>
 }
 
 export {

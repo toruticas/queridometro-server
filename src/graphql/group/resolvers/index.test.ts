@@ -118,6 +118,7 @@ describe('group resolvers', () => {
   test('create a group', async () => {
     const Group: Model<IGroup> = GroupModel(dbConn)
     const {
+      errors,
       data: { createGroup },
     } = await query(
       {

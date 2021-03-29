@@ -4,6 +4,7 @@ import { Config } from 'apollo-server-core'
 import { resolvers } from 'graphql/resolvers'
 import { typeDefs } from 'graphql/schema'
 import { schemaDirectives } from 'graphql/directives'
+import { dataSources } from 'graphql/dataSources'
 
 const { NODE_ENV } = process.env
 
@@ -19,7 +20,12 @@ const APOLLO_CONFIG: Config = {
   schemaDirectives,
   context: async context => {
     const dbConn = await getConnection()
-    return { dbConn, ...context }
+
+    return {
+      dbConn,
+      dataSources: dataSources(dbConn),
+      ...context,
+    }
   },
   debug: NODE_ENV === 'production',
   subscriptions: false,

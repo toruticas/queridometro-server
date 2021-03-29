@@ -13,6 +13,7 @@ interface JwtData {
   iat: number
   exp: number
   uuid: string
+  role: Role
 }
 
 type TContext = TContextExpress | TContextLambda
@@ -62,9 +63,10 @@ class AuthDirective extends SchemaDirectiveVisitor {
         }
 
         const token = authorization.replace('Bearer ', '')
-        const { uuid } = jwt.verify(token, String(JWT_SECRET)) as JwtData
+        const { uuid, role } = jwt.verify(token, String(JWT_SECRET)) as JwtData
 
         args[2].uuid = uuid
+        args[2].role = role
       } catch (e: unknown) {
         handleError(role, e)
       }

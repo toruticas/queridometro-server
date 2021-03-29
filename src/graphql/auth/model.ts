@@ -42,4 +42,4 @@ const collectionName = 'auth'
 const AuthModel = (conn: Connection): Model<IAuth> =>
   conn.model<IAuth>(collectionName, AuthSchema)
 
-export { AuthModel }
+export { AuthModel, AuthSchema }

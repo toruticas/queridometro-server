@@ -54,4 +54,4 @@ const collectionName = 'group'
 const GroupModel = (conn: Connection): Model<IGroup> =>
   conn.model<IGroup>(collectionName, GroupSchema)
 
-export { GroupModel }
+export { GroupModel, GroupSchema }
